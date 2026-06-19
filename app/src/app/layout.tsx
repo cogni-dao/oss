@@ -34,8 +34,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Cogni",
-  description: "Web3 Gov + Web2 AI",
+  title: "cogni/oss — The Open Source Knowledge Map",
+  description:
+    "A community-owned, dynamically rankable map of the world's open source software, its licenses, and how to stitch it into your project.",
 };
 
 // See operator/app/src/app/layout.tsx for rationale — `headers()` in the

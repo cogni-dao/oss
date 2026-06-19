@@ -16,6 +16,7 @@ import type { ReactElement } from "react";
 
 import { HomeStats } from "@/features/home/components/HomeStats";
 import { NewHomeHero } from "@/features/home/components/NewHomeHero";
+import { StitchSection } from "@/features/home/components/StitchSection";
 import { getServerSessionUser } from "@/lib/auth/server";
 
 import { AuthRedirect } from "./AuthRedirect";
@@ -30,6 +31,7 @@ export default async function HomePage(): Promise<ReactElement> {
     <div className="flex min-h-screen flex-col">
       <AuthRedirect />
       <NewHomeHero />
+      <StitchSection />
       <HomeStats />
     </div>
   );

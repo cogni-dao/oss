@@ -3,131 +3,108 @@
 
 /**
  * Module: `@features/home/components/NewHomeHero`
- * Purpose: Hero section for the homepage with sparkles effect.
- * Scope: Homepage only. Does not handle global layout.
- * Invariants: None.
- * Side-effects: none
- * Links: src/components/vendor/shadcn-io/sparkles.tsx, src/features/home/hooks/useTryDemo.ts
+ * Purpose: cogni/oss landing hero — frames the mission (a navigable knowledge map of the
+ *   world's open source, license-aware, AI-stitched) over an animated constellation atlas.
+ * Scope: Homepage only. Does not handle global layout or auth UI.
+ * Invariants: Staggered load reveal; token-only color; CTAs route via useTryDemo / Links.
+ * Side-effects: none (CTA handler lives in useTryDemo).
+ * Links: src/features/home/components/OssConstellation.tsx, src/features/home/hooks/useTryDemo.ts
  */
 
 "use client";
 
-import { ArrowRight, Github } from "lucide-react";
+import { ArrowRight, Github, Map as MapIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactElement } from "react";
 
 import { Button } from "@/components";
-// eslint-disable-next-line no-restricted-imports
-import { SparklesCore } from "@/components/vendor/shadcn-io/sparkles";
 
 import { useTryDemo } from "../hooks/useTryDemo";
+import { OssConstellation } from "./OssConstellation";
+
+const CATEGORIES = [
+  "auth",
+  "payments",
+  "vector db",
+  "queues",
+  "observability",
+  "ui kits",
+  "licenses",
+] as const;
 
 export function NewHomeHero(): ReactElement {
   const { handleTryDemo } = useTryDemo();
 
   return (
-    <>
-      {/* eslint-disable-next-line ui-governance/no-arbitrary-non-token-values */}
-      <section className="relative flex h-[25rem] w-full flex-col items-center justify-center overflow-hidden bg-background md:h-[40rem]">
-        {/* Hero Title with Sparkles */}
-        {}
-        <h1 className="relative z-20 whitespace-nowrap text-center font-bold text-2xl text-foreground md:text-5xl lg:text-6xl">
-          Build{" "}
-          <span className="relative inline-block text-gradient-accent">
-            community-owned
-            {/* Sparkles Effect Container */}
-            <div className="absolute top-full left-0 h-28 w-full md:h-40">
-              {/* Gradients */}
-              {/* eslint-disable-next-line ui-governance/no-raw-colors, ui-governance/no-arbitrary-non-token-values */}
-              <div className="absolute top-0 left-0 h-[2px] w-full bg-indigo-500 blur-sm [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]" />
-              {/* eslint-disable-next-line ui-governance/no-raw-colors */}
-              <div className="absolute top-0 left-0 h-px w-full bg-indigo-500 [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]" />
-              {/* eslint-disable-next-line ui-governance/no-raw-colors, ui-governance/no-arbitrary-non-token-values */}
-              <div className="absolute top-0 left-0 h-[5px] w-full bg-sky-500 blur-sm [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]" />
-              {/* eslint-disable-next-line ui-governance/no-raw-colors */}
-              <div className="absolute top-0 left-0 h-px w-full bg-sky-500 [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]" />
+    <section className="relative w-full overflow-hidden bg-background">
+      {/* Atlas background */}
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <OssConstellation />
+      </div>
+      {/* Fade the atlas into the page bottom so content stays legible */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
 
-              {/* Core component - Mobile */}
-              <SparklesCore
-                id="tsparticles-mobile"
-                background="transparent"
-                minSize={0.1}
-                maxSize={0.9}
-                particleDensity={4000}
-                className="h-full w-full md:hidden"
-                particleColor={[
-                  "#A855F7",
-                  "#22C55E",
-                  "#EAB308",
-                  "#EF4444",
-                  "#00C9FF",
-                ]}
-              />
+      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 py-28 text-center sm:px-6 md:py-40">
+        {/* Eyebrow */}
+        <div className="duration-700 animate-in fade-in slide-in-from-bottom-2">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 font-mono text-muted-foreground text-xs uppercase tracking-widest backdrop-blur">
+            <span className="size-1.5 rounded-full bg-primary" />
+            open source · indexed · ranked · stitched
+          </span>
+        </div>
 
-              {/* Core component - Desktop */}
-              <SparklesCore
-                id="tsparticles-desktop"
-                background="transparent"
-                minSize={0.4}
-                maxSize={1}
-                particleDensity={1200}
-                className="hidden h-full w-full md:block"
-                particleColor={[
-                  "#A855F7",
-                  "#22C55E",
-                  "#EAB308",
-                  "#EF4444",
-                  "#00C9FF",
-                ]}
-              />
-
-              {/* Radial Gradient to prevent sharp edges */}
-              <div className="absolute inset-0 h-full w-full bg-background [mask-image:radial-gradient(250px_100px_at_top,transparent_20%,white)] md:[mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]" />
-            </div>
-          </span>{" "}
-          AI apps.
+        {/* Headline */}
+        <h1 className="mt-8 text-balance font-bold text-4xl text-foreground leading-tight tracking-tight duration-700 animate-in fade-in slide-in-from-bottom-3 sm:text-6xl md:text-7xl">
+          Navigate the world&apos;s{" "}
+          <span className="text-gradient-accent">open source.</span>
         </h1>
 
-        {/* Content Below Sparkles */}
-        <div className="relative z-20 mx-auto mt-20 max-w-7xl px-4 sm:px-6 md:mt-44">
-          {}
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-              <Button variant="outline" size="lg" asChild>
-                <Link
-                  href="https://discord.gg/3b9sSyhZ4z"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg
-                    viewBox="0 0 127.14 96.36"
-                    fill="currentColor"
-                    className="mr-2 size-4"
-                    aria-hidden="true"
-                  >
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z" />
-                  </svg>
-                  Join the Chat
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="https://github.com/cogni-dao/cogni">
-                  <Github className="mr-2 size-4" />
-                  Start your own
-                </Link>
-              </Button>
-              <Button size="lg" onClick={handleTryDemo}>
-                Try the demo
-                <ArrowRight className="ml-2 size-4" />
-              </Button>
-            </div>
+        {/* Subhead */}
+        <p className="mt-6 max-w-2xl text-pretty text-base text-muted-foreground leading-relaxed delay-150 duration-700 animate-in fade-in slide-in-from-bottom-3 sm:text-lg">
+          A living map of every open source tool, the licenses that govern it,
+          and how the pieces fit together — so you and your AI developer can ship
+          with proven code instead of reinventing it.
+        </p>
 
-            <p className="mt-8 max-w-3xl text-lg text-muted-foreground sm:text-xl">
-              Web3 Gov + Web2 AI
-            </p>
-          </div>
+        {/* CTAs */}
+        <div className="mt-10 flex flex-col items-center gap-3 delay-300 duration-700 animate-in fade-in slide-in-from-bottom-3 sm:flex-row">
+          <Button size="lg" onClick={handleTryDemo}>
+            Describe what you want to build
+            <ArrowRight className="ml-2 size-4" />
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/knowledge">
+              <MapIcon className="mr-2 size-4" />
+              Explore the map
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link
+              href="https://github.com/Cogni-DAO/oss"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Github className="mr-2 size-4" />
+              GitHub
+            </Link>
+          </Button>
         </div>
-      </section>
-    </>
+
+        {/* Category index chips */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-2 delay-500 duration-1000 animate-in fade-in">
+          {CATEGORIES.map((c) => (
+            <span
+              key={c}
+              className="rounded-md border border-border/60 bg-card/40 px-3 py-1 font-mono text-muted-foreground text-xs backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+            >
+              {c}
+            </span>
+          ))}
+          <span className="px-1 font-mono text-muted-foreground/60 text-xs">
+            +∞ more
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }

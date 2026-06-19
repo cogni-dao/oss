@@ -9,15 +9,27 @@
 
 schema_version: "0.1.4"
 
-node_id: "b927a9dd-6132-4fc9-a51e-e3cee2568e3c"
-scope_id: "b44d4394-3147-5787-acab-51546be6a3da"
+node_id: "4d7ffb44-fc26-4a55-864f-eff9fbc8aba1"
+scope_id: "715bb6f7-34cf-5673-88e3-a3b030abddd1"
 scope_key: "default"
 
 intent:
-  name: node-template
+  name: oss
 
 cogni_dao:
-  chain_id: "8453" # Base mainnet
+  dao_contract: "0x48a093156d117e1827170eb913a13412c50e8090"
+  plugin_contract: "0xe464d002a5dde2812ca5011083737b0fac9b5b1a"
+  signal_contract: "0xad8eb4a0b3a6d087585f96d49dbd66d120f605a2"
+  chain_id: "8453"
+
+knowledge:
+  database: "knowledge_oss"
+  remote:
+    provider: dolthub
+    owner: "cogni-dao"
+    repo: "knowledge-oss"
+    url: "https://doltremoteapi.dolthub.com/cogni-dao/knowledge-oss"
+    custody: cogni-owned
 
 # Activity ledger ingestion + approver allowlist.
 # `approvers` gates the `(admin)/` route group and write routes under
@@ -30,7 +42,7 @@ activity_ledger:
   activity_sources:
     github:
       attribution_pipeline: cogni-v0.0
-      source_refs: ["Cogni-DAO/standalone-node"]
+      source_refs: ["Cogni-DAO/oss"]
 
 payments:
   status: pending_activation
