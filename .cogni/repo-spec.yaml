@@ -15,6 +15,11 @@ scope_key: "default"
 
 intent:
   name: oss
+  hook: "Build anything for free, with OSS"
+  mission: "An AI consultant for building with open source — a living map of the world's most valuable OSS tooling and when/how to use it. Expert in prototyping, shipping services, and software licensing: how to build what you need for free with existing tools, for the whole world (not just this network)."
+  brand:
+    icon: "Waypoints"
+    color: "#06b6d4"
 
 cogni_dao:
   dao_contract: "0x48a093156d117e1827170eb913a13412c50e8090"
