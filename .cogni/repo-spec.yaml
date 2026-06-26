@@ -21,7 +21,7 @@ intent:
     icon: "Waypoints"
     color: "#06b6d4"
 
-cogni_dao:
+governance:
   dao_contract: "0x48a093156d117e1827170eb913a13412c50e8090"
   plugin_contract: "0xe464d002a5dde2812ca5011083737b0fac9b5b1a"
   signal_contract: "0xad8eb4a0b3a6d087585f96d49dbd66d120f605a2"
