@@ -43,15 +43,9 @@ function isAlreadyExists(err) {
   // Narrow to DDL-collision shapes drizzle-kit emits. "X already exists" alone
   // would swallow unrelated drift (e.g. function/type/constraint collisions
   // that may indicate a real bug, not idempotent recovery).
-  return /\b(?:table|index|schema|relation|constraint|column) [^\s]+ already exists/i.test(
+  return /\b(?:table|index|schema|relation|constraint) [^\s]+ already exists/i.test(
     `${msg} ${cause}`
   );
-}
-
-function isNothingToCommit(err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  const cause = err?.cause instanceof Error ? err.cause.message : "";
-  return /nothing to commit|no changes/i.test(`${msg} ${cause}`);
 }
 
 // Idempotency for DROP statements: if a forward migration drops something
@@ -96,25 +90,13 @@ async function applyPending(sql, folder) {
   );
 
   const rows = await sql.unsafe(
-    `SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at ASC`
+    `SELECT created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 1`
   );
-  const appliedByWhen = new Map(
-    rows
-      .filter((row) => row.created_at != null)
-      .map((row) => [Number(row.created_at), String(row.hash ?? "")])
-  );
-  const lastWhen = Math.max(0, ...appliedByWhen.keys());
+  const lastWhen = rows[0]?.created_at != null ? Number(rows[0].created_at) : 0;
 
   let applied = 0;
   for (const migration of migrations) {
-    const appliedHash = appliedByWhen.get(migration.folderMillis);
-    if (appliedHash === migration.hash) continue;
-    if (!appliedHash && migration.folderMillis <= lastWhen) continue;
-    if (appliedHash && appliedHash !== migration.hash) {
-      console.log(
-        `↻ ${NODE} replaying migration ${migration.folderMillis}: journal hash changed`
-      );
-    }
+    if (migration.folderMillis <= lastWhen) continue;
     for (const stmt of migration.sql) {
       const trimmed = stmt.trim();
       if (!trimmed) continue;
@@ -130,30 +112,12 @@ async function applyPending(sql, folder) {
         throw err;
       }
     }
-    if (appliedHash) {
-      await sql.unsafe(
-        `UPDATE drizzle.__drizzle_migrations SET hash = ${sqlEscape(migration.hash)} WHERE created_at = ${migration.folderMillis}`
-      );
-    } else {
-      await sql.unsafe(
-        `INSERT INTO drizzle.__drizzle_migrations (hash, created_at) VALUES (${sqlEscape(migration.hash)}, ${migration.folderMillis})`
-      );
-    }
-    appliedByWhen.set(migration.folderMillis, migration.hash);
+    await sql.unsafe(
+      `INSERT INTO drizzle.__drizzle_migrations (hash, created_at) VALUES (${sqlEscape(migration.hash)}, ${migration.folderMillis})`
+    );
     applied += 1;
   }
   return applied;
-}
-
-async function commitMigration(sql) {
-  try {
-    await sql`SELECT dolt_commit('-Am', 'migration: drizzle-kit batch')`;
-    return "stamped";
-  } catch (err) {
-    if (!isNothingToCommit(err)) throw err;
-    console.log(`✓ ${NODE} dolt_commit skipped: nothing to commit`);
-    return "skipped";
-  }
 }
 
 async function withConnection(fn) {
@@ -176,11 +140,11 @@ try {
     console.log(
       `✓ ${NODE} schema verified against snapshot ${verifyResult.latestTag} (${verifyResult.tablesChecked} table(s))`
     );
-    const commitStatus = await commitMigration(sql);
-    return { applied, commitStatus };
+    await sql`SELECT dolt_commit('-Am', 'migration: drizzle-kit batch')`;
+    return applied;
   });
   console.log(
-    `✅ ${NODE} migrate complete: ${result.applied} migration(s) applied/reconciled + verified + dolt_commit ${result.commitStatus} in ${Date.now() - t0}ms`
+    `✅ ${NODE} migrate complete: ${result} migration(s) applied + verified + dolt_commit stamped in ${Date.now() - t0}ms`
   );
 } catch (err) {
   console.error(`FATAL(${NODE}): migrate failed:`, err);
