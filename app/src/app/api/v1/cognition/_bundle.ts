@@ -33,10 +33,23 @@ import type {
 export const SESSION_BOOTSTRAP_INVARIANTS: readonly string[] = [
 	"Adopt exactly ONE work item and ONE node per session (single-node-scope is a CI gate); claim + heartbeat + link the PR via /api/v1/work/items/{id}/{claims,heartbeat,pr}; coordination.nextAction is authoritative.",
 	"RECALL the node knowledge hub before designing, researching, or coding — both merged (/api/v1/knowledge?domain=) and your own open contribution branch — and refine in place over creating new.",
-	"Git path: push a same-repo feature branch, open a PR, and let CI verify the exact head (gh pr checks). Flight that PR head to candidate-a before merge. The operator is the deploy plane only — flight, logs, secrets — not where code, work items, or knowledge live.",
+	"Git path: push a same-repo feature branch, open a PR, and let CI verify the exact head (gh pr checks). Flight that PR head to candidate-a before merge. The operator is the deploy plane only — flight, logs, secrets — not where code, work items, or knowledge live. Watch each async gate (CI, flight, deploy) the ONE portable way — see <watch-gate> below.",
 	"Definition of Done = validated on candidate-a, not merely merged: flight the PR, exercise the live deployed surface, read your own request back from Loki at the deployed SHA, and post a /validate-candidate scorecard — that posted scorecard is the merge gate.",
 	"Recall this node's <slug>-agent-orientation entry for the operating map — architecture and observability standards, what's safe to run, what can break prod/candidate, and what to recall next — and refine it in the hub as the node changes.",
 ];
+
+/**
+ * How to watch an async CI/CD gate — the ONE portable technique, tagged for
+ * machine parse + recall. Code-owned (survives an empty hub) and XML-structured
+ * so any harness (Claude, Codex, OpenAI, plain shell) extracts the exact command
+ * without prose parsing. Deliberately terse: five tagged atoms, no run-on prose.
+ */
+export const SESSION_WATCH_GATE = `<watch-gate rule="ONE blocking command; its exit code or matched value IS the verdict — no harness-specific monitor/background/notification primitive, never fire-and-forget, re-read the ground-truth signal before reporting">
+  <ci-green>gh pr checks {PR} --watch --fail-fast — blocks; 0=all pass, nonzero=failed. NOT --required (omits real gates, e.g. build). Re-read after (one-shot 8=pending) — finished ≠ green.</ci-green>
+  <flight-landed>poll curl -s {candidate}/version until .buildSha == PR-head SHA → then /validate-candidate. Bound it; no match = flight FAILED, report not hang. host: {node}-test.cognidao.org.</flight-landed>
+  <deploy-landed>poll curl -s {target}/version until .buildSha == promoted SHA; bound, report on no-match. host: {node-}{preview,}cognidao.org.</deploy-landed>
+  <truth>/version.buildSha is the only ground truth — CI and workflow "success" can lie.</truth>
+</watch-gate>`;
 
 const COGNITION_ENTRY_TYPES: ReadonlySet<string> = new Set([
 	"skill",
@@ -179,6 +192,10 @@ export function renderBundleMarkdown(input: RenderBundleInput): string {
 		"## Tooling invariants (irreducible session contract)",
 		"",
 		invariants,
+		"",
+		"## Watch an async gate — CI · flight · deploy",
+		"",
+		SESSION_WATCH_GATE,
 		"",
 		"## Skills index (recall full content from the hub before acting)",
 		"",
